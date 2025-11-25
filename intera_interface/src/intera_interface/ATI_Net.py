@@ -9,6 +9,7 @@ ATI Net Delta Force Torce Sensor Data communications and file handling
 
 """
 
+import rospy
 import socket
 import struct
 import time
@@ -24,12 +25,13 @@ class DeltaFtSensor():
         #Create Socker Instance
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         
-        #Try to connecto to ATI Sensor
+        #Try to connect to ATI Sensor
         try:
             self.sock.connect((self.ip_address, self.port))
             self._send_command(65)
         except Exception as e:
-            print("An unexpected error occurred: %s",e)
+            rospy.logerror("An unexpected error occurred while connecting to ATI sensor: %s",e)
+            raise RuntimeError("An unexpected error occurred while connecting to ATI sensor: %s",e)
     
     #Close socket instance in destructor
     def __del__(self):
@@ -61,7 +63,8 @@ class DeltaFtSensor():
             message = struct.pack('!HHI', header, cmd, 0)
             self.sock.sendto(message, (self.ip_address, self.port))
         except:
-            print("Command send but connection not available, please check connection status")
+            rospy.logerror("Command send but connection not available, please check connection status")
+            raise RuntimeError("Command send but connection not available, please check connection status")
     
     def get_data(self):
         rawdata = self.sock.recv(36)

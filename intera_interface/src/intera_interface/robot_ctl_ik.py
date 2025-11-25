@@ -221,7 +221,7 @@ class SawyerRobot():
     
     #Move to desired joint positions in radians, with a timeout (not a linear interpolation)
     #Speed ratio must be within [0.0,1.0]
-    def move_to_joint_position(self, joint_angles, speed_ratio, timeout=30.0):
+    def move_to_joint_position(self, joint_angles, speed_ratio, timeout=15.0):
         
         self.timeout = timeout
         
