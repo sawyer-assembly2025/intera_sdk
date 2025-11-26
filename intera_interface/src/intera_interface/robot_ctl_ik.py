@@ -21,6 +21,7 @@ from intera_interface import (
     get_current_gripper_interface,
     Cuff,
     Limb,
+    Lights,
     RobotParams,
 )
 from geometry_msgs.msg import (
@@ -91,6 +92,7 @@ class SawyerRobot():
             
             #If ClickSmartGripper initialize if needed
             if self._is_clicksmart:
+                self._lights = Lights()
                 if self._gripper.needs_init():
                     self._gripper.initialize()
                 msg = "Smart Click Connection found and initialized, ready for use"
@@ -200,7 +202,30 @@ class SawyerRobot():
             #Return as list so values can be edited with quaternions orientation
             endpoint_orientation_quaternion = list(endpoint_orientation_quaternion)
             return endpoint_position, endpoint_orientation_quaternion
+
+    #Set green color light
+    def set_green_light(self):
+        self._set_light("green",True)
+        self._set_light("red",False)
+        self._set_light("blue",False)
     
+    #Set red color light
+    def set_red_light(self):
+        self._set_light("green",False)
+        self._set_light("red",True)
+        self._set_light("blue",False)
+    
+    #Set blue color light
+    def set_blue_light(self):
+        self._set_light("green",False)
+        self._set_light("red",False)
+        self._set_light("blue",True)
+    
+    #Set Light
+    def _set_light(self,color,value):
+        self._lights.set_light_state('head_{0}_light'.format(color), on=bool(value))
+        self._lights.set_light_state('{0}_hand_{1}_light'.format(self._arm, color), on=bool(value))
+            
     #Open EOAT Gripper
     def open_gripper(self):
         if self._gripper.is_ready():
