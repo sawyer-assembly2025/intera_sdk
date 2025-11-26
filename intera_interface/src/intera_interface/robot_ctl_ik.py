@@ -261,7 +261,7 @@ class SawyerRobot():
         rospy.loginfo("Moved to home angles: %s", self._limb.joint_angles)  
 
     #Final pose as PoseStamped(), linear_speed in m/s
-    def cartesian_movement(self, final_pose, linear_speed=0.01):
+    def cartesian_movement(self, final_pose, linear_speed=0.1):
         
         #Get current pose
         current_pose = self._limb.endpoint_pose()
@@ -316,7 +316,7 @@ class SawyerRobot():
             ik_step.position.y = d*ik_delta.y + final_pose.pose.position.y
             ik_step.position.z = d*ik_delta.z + final_pose.pose.position.z
             # Perform a proper quaternion interpolation
-            q_slerp = quaternion_slerp(q_current, q_pose, (1000-d)/steps)
+            q_slerp = quaternion_slerp(q_current, q_pose, ((steps-d)/steps))
             ik_step.orientation.x = q_slerp[0]
             ik_step.orientation.y = q_slerp[1]
             ik_step.orientation.z = q_slerp[2]
@@ -376,7 +376,7 @@ class SawyerRobot():
         self.cartesian_movement(final_pose=move_pose, linear_speed=linear_speed)        
 
     #Moves to desired relative position using linear interpolation (Orientation in Euler angles ori = [roll, pitch, yaw])
-    def move_to_cartesian_relative(self, position, orientation):
+    def move_to_cartesian_relative(self, position, orientation, linear_speed = 0.1):
         
         #Get current endpoint pose
         current_position, current_orientation = self.current_endpoint_pose()
@@ -407,7 +407,7 @@ class SawyerRobot():
         move_pose.pose.orientation.w = float(move_quaternion[3])
         
         #Move to desired position
-        self.cartesian_movement(final_pose=move_pose)  
+        self.cartesian_movement(final_pose=move_pose,linear_speed=linear_speed)  
         
 if __name__ == '__main__':
     pass
